@@ -3,6 +3,7 @@
 #include "managers/font-manager.h"
 #include "raylib.h"
 #include "wheel/spin-wheel.h"
+#include "wheel/wheel-editor.h"
 
 int main() {
   SetTraceLogLevel(LOG_WARNING);
@@ -18,28 +19,23 @@ int main() {
   // 创建转盘
   Vector2 wheel_center = {screen_width / 2.0f, screen_height / 2.0f};
   SpinWheel wheel(wheel_center, 200.0f);
+  WheelEditor wheel_editor(wheel);
 
   float background_animation = 0;
 
   while (!WindowShouldClose()) {
     float delta_time = GetFrameTime();
+
+    /*─────────────────────────────────────┐
+    │                Update                │
+    └──────────────────────────────────────*/
     background_animation += delta_time;
-
-    // 输入处理
-    if (IsKeyPressed(KEY_SPACE)) {
-      if (wheel.GetState() == SpinState::kIdle || wheel.IsShowingResult()) {
-        wheel.Spin();
-      }
-    }
-
-    if (IsKeyPressed(KEY_R)) {
-      wheel.Reset();
-    }
-
-    // 更新游戏
     wheel.Update(delta_time);
+    wheel_editor.Update(delta_time);
 
-    // 绘制
+    /*─────────────────────────────────────┐
+    │                Draw                  │
+    └──────────────────────────────────────*/
     BeginDrawing();
 
     // 动态背景
@@ -59,27 +55,8 @@ int main() {
     DrawTextEx(FontManager::Get().Italic(), "Press [R] to reset", (Vector2){50, 130},
                static_cast<float>(SpinFontSize::kSubtitle), 2.0f, LIGHTGRAY);
 
-    // 绘制转盘
     wheel.Draw();
-
-    // 绘制状态信息
-    std::string state_text;
-    switch (wheel.GetState()) {
-      case SpinState::kIdle:
-        state_text = "Ready";
-        break;
-      case SpinState::kSpinning:
-        state_text = "Spinning";
-        break;
-      case SpinState::kSlowingDown:
-        state_text = "Slowing down";
-        break;
-      case SpinState::kStopped:
-        state_text = "Stopped";
-        break;
-    }
-    DrawTextEx(FontManager::Get().Italic(), state_text.c_str(), (Vector2){50, screen_height - 100},
-               static_cast<float>(SpinFontSize::kSubtitle), 2.0f, WHITE);
+    wheel_editor.Draw();
 
     // FPS 显示
     std::string fps_text = "FPS: " + std::to_string(GetFPS());

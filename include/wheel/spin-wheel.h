@@ -12,6 +12,7 @@ enum class SpinFontSize { kTitle = 36, kSubtitle = 24, kWheelText = 20, kResult 
 struct WheelOption {
   std::string text;
   Color color;
+  int weight;
   float start_angle;
   float end_angle;
 };
@@ -20,14 +21,8 @@ class SpinWheel {
 public:
   SpinWheel(Vector2 pos, float r) : center_(pos), radius_(r) { InitializeOptions(); }
 
-  void InitializeOptions();
-
   void Update(float delta_time);
   void Draw();
-
-  void Spin();
-  void Reset();
-  void CalculateSelectedOption();
 
   SpinState GetState() const { return state_; }
   bool IsShowingResult() const { return show_result_; }
@@ -53,4 +48,10 @@ private:
 
   // 随机数生成器
   std::mt19937 rng_{std::random_device{}()};
+
+  void InitializeOptions();
+  void HandleInput();
+  void Spin();
+  void Reset();
+  void CalculateSelectedOption();
 };

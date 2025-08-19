@@ -8,15 +8,24 @@
 void SpinWheel::InitializeOptions() {
   std::vector<std::string> texts = {"Big", "Small", "Miss", "Again", "Secret", "Double", "Again", "SSR Huge"};
   std::vector<Color> colors = {RED, BLUE, GREEN, YELLOW, PURPLE, ORANGE, PINK, SKYBLUE};
+  std::vector<int> weights = {2, 3, 1, 2, 1, 2, 2, 1};
 
   float angle_step = 2 * PI / texts.size();
 
-  int n = texts.size();
-  for (size_t i = 0; i < n; i++) {
+  int total_weights = 0;
+  for (int weight : weights) {
+    total_weights += weight;
+  }
+
+  float pivot = 0;
+  for (int i = texts.size() - 1; i >= 0; i--) {
+    float angle_span = static_cast<float>(weights[i]) / total_weights * 2 * PI;
     options_.emplace_back(WheelOption{.text = texts[i],
                                       .color = colors[i % colors.size()],
-                                      .start_angle = (n - i - 1) * angle_step,
-                                      .end_angle = (n - i) * angle_step});
+                                      .weight = weights[i],
+                                      .start_angle = pivot,
+                                      .end_angle = pivot + angle_span});
+    pivot += angle_span;
   }
 }
 
@@ -119,6 +128,26 @@ void SpinWheel::Draw() {
   DrawTriangle(pointer1, pointer2, pointer3, RED);
   DrawTriangleLines(pointer1, pointer2, pointer3, DARKBROWN);
 
+  // 绘制轮盘状态
+  std::string state_text;
+  switch (state_) {
+    case SpinState::kIdle:
+      state_text = "Ready";
+      break;
+    case SpinState::kSpinning:
+      state_text = "Spinning";
+      break;
+    case SpinState::kSlowingDown:
+      state_text = "Slowing down";
+      break;
+    case SpinState::kStopped:
+      state_text = "Stopped";
+      break;
+  }
+  DrawTextEx(FontManager::Get().Italic(), state_text.c_str(),
+             (Vector2){50, static_cast<float>(GetScreenHeight()) - 100}, static_cast<float>(SpinFontSize::kSubtitle),
+             2.0f, WHITE);
+
   // 绘制结果
   if (show_result_ && selected_index_ >= 0) {
     float result_alpha = fminf(1.0f, result_display_time_ * 2.0f);
@@ -177,4 +206,16 @@ void SpinWheel::Reset() {
   selected_index_ = -1;
   show_result_ = false;
   result_display_time_ = 0;
+}
+
+void SpinWheel::HandleInput() {
+  if (IsKeyPressed(KEY_SPACE)) {
+    if (state_ == SpinState::kIdle || IsShowingResult()) {
+      Spin();
+    }
+  }
+
+  if (IsKeyPressed(KEY_R)) {
+    Reset();
+  }
 }
