@@ -24,6 +24,7 @@ public:
   void Update(float delta_time);
   void Draw();
 
+  std::vector<WheelOption> GetOptions() const { return options_; }
   SpinState GetState() const { return state_; }
   bool IsShowingResult() const { return show_result_; }
 

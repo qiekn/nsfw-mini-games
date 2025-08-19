@@ -2,6 +2,7 @@
 #include <string>
 #include "managers/font-manager.h"
 #include "raylib.h"
+#include "terminal.h"
 #include "wheel/spin-wheel.h"
 #include "wheel/wheel-editor.h"
 
@@ -21,17 +22,20 @@ int main() {
   SpinWheel wheel(wheel_center, 200.0f);
   WheelEditor wheel_editor(wheel);
 
+  Terminal terminal;
+
   float background_animation = 0;
 
   while (!WindowShouldClose()) {
-    float delta_time = GetFrameTime();
+    float dt = GetFrameTime();
 
     /*─────────────────────────────────────┐
     │                Update                │
     └──────────────────────────────────────*/
-    background_animation += delta_time;
-    wheel.Update(delta_time);
-    wheel_editor.Update(delta_time);
+    background_animation += dt;
+    wheel.Update(dt);
+    // wheel_editor.Update(dt);
+    terminal.Update(dt);
 
     /*─────────────────────────────────────┐
     │                Draw                  │
@@ -56,7 +60,8 @@ int main() {
                static_cast<float>(SpinFontSize::kSubtitle), 2.0f, LIGHTGRAY);
 
     wheel.Draw();
-    wheel_editor.Draw();
+    // wheel_editor.Draw();
+    terminal.Draw();
 
     // FPS 显示
     std::string fps_text = "FPS: " + std::to_string(GetFPS());
