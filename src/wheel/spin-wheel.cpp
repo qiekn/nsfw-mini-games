@@ -47,6 +47,7 @@ void SpinWheel::Spin() {
 }
 
 void SpinWheel::Update(float delta_time) {
+  HandleInput();
   switch (state_) {
     case SpinState::kSpinning:
     case SpinState::kSlowingDown: {
