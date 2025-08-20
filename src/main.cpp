@@ -4,7 +4,6 @@
 #include "raylib.h"
 #include "terminal.h"
 #include "wheel/spin-wheel.h"
-#include "wheel/wheel-editor.h"
 
 int main() {
   SetTraceLogLevel(LOG_WARNING);
@@ -20,9 +19,6 @@ int main() {
   // 创建转盘
   Vector2 wheel_center = {screen_width / 2.0f, screen_height / 2.0f};
   SpinWheel wheel(wheel_center, 200.0f);
-  WheelEditor wheel_editor(wheel);
-
-  Terminal terminal;
 
   float background_animation = 0;
 
@@ -34,8 +30,7 @@ int main() {
     └──────────────────────────────────────*/
     background_animation += dt;
     wheel.Update(dt);
-    // wheel_editor.Update(dt);
-    terminal.Update(dt);
+    Terminal::Get().Update(dt);
 
     /*─────────────────────────────────────┐
     │                Draw                  │
@@ -60,8 +55,7 @@ int main() {
                static_cast<float>(SpinFontSize::kSubtitle), 2.0f, LIGHTGRAY);
 
     wheel.Draw();
-    // wheel_editor.Draw();
-    terminal.Draw();
+    Terminal::Get().Draw();
 
     // FPS 显示
     std::string fps_text = "FPS: " + std::to_string(GetFPS());

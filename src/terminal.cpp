@@ -8,19 +8,23 @@
 #include "utilities/color.h"
 
 Terminal::Terminal() : current_directory_("/home/player") {
+  // clang-format off
   command_table_ = {
-      {"ls", [this](auto& args) { CmdLs(args); }},       {"pwd", [this](auto& args) { CmdPwd(args); }},
-      {"cd", [this](auto& args) { CmdCd(args); }},       {"cat", [this](auto& args) { CmdCat(args); }},
-      {"clear", [this](auto& args) { CmdClear(args); }}, {"echo", [this](auto& args) { CmdEcho(args); }},
-      {"set", [this](auto& args) { CmdSet(args); }},     {"help", [this](auto& args) { CmdHelp(args); }},
+      {"ls", [this](auto& args) { CmdLs(args); }},
+      {"pwd", [this](auto& args) { CmdPwd(args); }},
+      {"cd", [this](auto& args) { CmdCd(args); }},
+      {"cat", [this](auto& args) { CmdCat(args); }},
+      {"clear", [this](auto& args) { CmdClear(args); }},
+      {"echo", [this](auto& args) { CmdEcho(args); }},
+      {"set", [this](auto& args) { CmdSet(args); }},
+      {"help", [this](auto& args) { CmdHelp(args); }},
   };
+  // clang-format on
   InitializeFilesystem();
   AddOutput("Welcome to Game Terminal v1.0");
   AddOutput("Type 'help' for available commands");
   AddOutput("");
 }
-
-Terminal::~Terminal() {}
 
 void Terminal::Update(float dt) {
   HandleInput();
@@ -240,20 +244,26 @@ void Terminal::InitializeFilesystem() {
   // Create virtual filesystem structure
   virtual_filesystem_["/"] = {"home", "usr", "var", "readme.txt"};
   virtual_filesystem_["/home"] = {"player", "guest"};
-  virtual_filesystem_["/home/player"] = {"documents", "saves", "config.cfg"};
-  virtual_filesystem_["/home/player/documents"] = {"notes.txt", "todo.txt"};
+  virtual_filesystem_["/home/player"] = {"docs", "saves", "readme.txt"};
+  virtual_filesystem_["/home/player/docs"] = {"notes.txt", "todo.txt"};
   virtual_filesystem_["/usr"] = {"bin", "lib"};
   virtual_filesystem_["/usr/bin"] = {"game", "editor"};
   virtual_filesystem_["/var"] = {"log", "tmp"};
   virtual_filesystem_["/var/log"] = {"game.log", "system.log"};
 
   // Create some virtual files
+  // clang-format off
   virtual_files_["/readme.txt"] = "Welcome to the game terminal!\nThis is a virtual filesystem for demonstration.";
-  virtual_files_["/home/player/config.cfg"] =
-      "# Game Configuration\nresolution=1920x1080\nfullscreen=false\nvolume=0.8";
-  virtual_files_["/home/player/documents/notes.txt"] = "Remember to check the secret area behind the waterfall!";
-  virtual_files_["/home/player/documents/todo.txt"] = "- Complete level 3\n- Find all collectibles\n- Defeat the boss";
+  virtual_files_["/home/player/readme.txt"] = "Welcome to the game terminal!\nThis is a virtual filesystem for demonstration.";
+  virtual_files_["/home/player/docs/notes.txt"] = "Welcome to the game terminal!\nThis is a virtual filesystem for demonstration.";
+  virtual_files_["/home/player/docs/todo.txt"] =
+      "- Spin the wheel once\n"
+      "- Spin the wheel twice\n"
+      "- Spin the wheel three times\n"
+      "- Spin the wheel four times\n"
+      "- Spin the wheel five times";
   virtual_files_["/var/log/game.log"] = "[INFO] Game started\n[DEBUG] Loading assets...\n[INFO] Player entered level 1";
+  // clang-format on
 }
 
 void Terminal::CmdLs(const std::vector<std::string>& args) {

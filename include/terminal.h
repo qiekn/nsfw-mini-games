@@ -4,19 +4,20 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "utilities/singleton.h"
 
 class Terminal {
 public:
   using CommandFunc = std::function<void(const std::vector<std::string>&)>;
+  MAKE_SINGLETON(Terminal);
 
-  Terminal();
-  virtual ~Terminal();
   void Update(float dt);
   void Draw();
   void Toggle() { is_open_ = !is_open_; }
   bool IsOpen() { return is_open_; }
 
 private:
+  Terminal();
   bool is_open_{false};
 
   /* UI */

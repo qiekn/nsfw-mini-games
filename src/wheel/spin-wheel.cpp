@@ -3,6 +3,7 @@
 #include <format>
 #include <string>
 #include "managers/font-manager.h"
+#include "terminal.h"
 #include "utilities/ease.h"
 
 void SpinWheel::InitializeOptions() {
@@ -210,6 +211,7 @@ void SpinWheel::Reset() {
 }
 
 void SpinWheel::HandleInput() {
+  if (Terminal::Get().IsOpen()) return;
   if (IsKeyPressed(KEY_SPACE)) {
     if (state_ == SpinState::kIdle || IsShowingResult()) {
       Spin();
