@@ -13,10 +13,11 @@ int main() {
   const int screen_width = 1000;
   const int screen_height = 700;
 
+  // CONFIG
+  bool show_fps = false;
+
   InitWindow(screen_width, screen_height, "game");
   SetTargetFPS(120);
-
-  // 创建转盘
 
   float background_animation = 0;
 
@@ -55,10 +56,11 @@ int main() {
     SpinWheel::Get().Draw();
     Terminal::Get().Draw();
 
-    // FPS 显示
-    std::string fps_text = "FPS: " + std::to_string(GetFPS());
-    DrawTextEx(FontManager::Get().Italic(), fps_text.c_str(), (Vector2){screen_width - 100, 20},
-               static_cast<float>(SpinFontSize::kFps), 2.0f, GREEN);
+    if (show_fps) {
+      std::string fps_text = "FPS: " + std::to_string(GetFPS());
+      DrawTextEx(FontManager::Get().Italic(), fps_text.c_str(), (Vector2){screen_width - 100, 20},
+                 static_cast<float>(SpinFontSize::kFps), 2.0f, GREEN);
+    }
 
     EndDrawing();
   }
