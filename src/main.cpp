@@ -17,8 +17,6 @@ int main() {
   SetTargetFPS(120);
 
   // 创建转盘
-  Vector2 wheel_center = {screen_width / 2.0f, screen_height / 2.0f};
-  SpinWheel wheel(wheel_center, 200.0f);
 
   float background_animation = 0;
 
@@ -29,7 +27,7 @@ int main() {
     │                Update                │
     └──────────────────────────────────────*/
     background_animation += dt;
-    wheel.Update(dt);
+    SpinWheel::Get().Update(dt);
     Terminal::Get().Update(dt);
 
     /*─────────────────────────────────────┐
@@ -54,7 +52,7 @@ int main() {
     DrawTextEx(FontManager::Get().Italic(), "Press [R] to reset", (Vector2){50, 130},
                static_cast<float>(SpinFontSize::kSubtitle), 2.0f, LIGHTGRAY);
 
-    wheel.Draw();
+    SpinWheel::Get().Draw();
     Terminal::Get().Draw();
 
     // FPS 显示

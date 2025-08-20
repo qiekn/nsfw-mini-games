@@ -7,25 +7,32 @@
 #include "utilities/ease.h"
 
 void SpinWheel::InitializeOptions() {
+  colors_ = {RED, BLUE, GREEN, YELLOW, PURPLE, ORANGE, PINK, SKYBLUE};
   std::vector<std::string> texts = {"Big", "Small", "Miss", "Again", "Secret", "Double", "Again", "SSR Huge"};
-  std::vector<Color> colors = {RED, BLUE, GREEN, YELLOW, PURPLE, ORANGE, PINK, SKYBLUE};
   std::vector<int> weights = {2, 3, 1, 2, 1, 2, 2, 1};
 
-  float angle_step = 2 * PI / texts.size();
+  for (int i = texts.size() - 1; i >= 0; i--) {
+    options_.emplace_back(WheelOption{.text = texts[i], .weight = weights[i]});
+  }
+  UpdateOptions();
+}
 
+void SpinWheel::UpdateOptions() {
+  float angle_step = 2 * PI / options_.size();
+  int n = 0;  // total count of options
   int total_weights = 0;
-  for (int weight : weights) {
-    total_weights += weight;
+  for (const auto& opt : options_) {
+    total_weights += opt.weight;
+    n++;
   }
 
   float pivot = 0;
-  for (int i = texts.size() - 1; i >= 0; i--) {
-    float angle_span = static_cast<float>(weights[i]) / total_weights * 2 * PI;
-    options_.emplace_back(WheelOption{.text = texts[i],
-                                      .color = colors[i % colors.size()],
-                                      .weight = weights[i],
-                                      .start_angle = pivot,
-                                      .end_angle = pivot + angle_span});
+  for (int i = n - 1; i >= 0; i--) {
+    float angle_span = static_cast<float>(options_[i].weight) / total_weights * 2 * PI;
+    auto& opt = options_[i];
+    opt.color = colors_[i % colors_.size()];
+    opt.start_angle = pivot;
+    opt.end_angle = pivot + angle_span;
     pivot += angle_span;
   }
 }
@@ -103,6 +110,9 @@ void SpinWheel::Draw() {
     text_pos.y -= text_size.y / 2;
 
     std::string display_text = std::to_string(count++) + " " + option.text;
+    // shadow
+    // DrawTextEx(FontManager::Get().Italic(), display_text.c_str(), (Vector2){text_pos.x + 0.5f, text_pos.y + 0.5f},
+    //            static_cast<float>(SpinFontSize::kWheelText), 2.0f, BLACK);
     DrawTextEx(FontManager::Get().Italic(), display_text.c_str(), text_pos,
                static_cast<float>(SpinFontSize::kWheelText), 2.0f, WHITE);
   }
@@ -111,7 +121,7 @@ void SpinWheel::Draw() {
   std::string debug_angle_text = std::format("Current Angle: {:.1f}", current_angle_ * RAD2DEG);
   DrawTextEx(FontManager::Get().Italic(), debug_angle_text.c_str(),
              (Vector2){50, static_cast<float>(GetScreenHeight() - 70)}, static_cast<float>(SpinFontSize::kSubtitle),
-             2.0f, WHITE);
+             2.0f, RAYWHITE);
 
   // 绘制外圈
   // DrawCircleLines(center_.x, center_.y, radius_, BLACK);

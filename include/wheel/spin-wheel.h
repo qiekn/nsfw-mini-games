@@ -4,6 +4,7 @@
 #include <random>
 #include <string>
 #include <vector>
+#include "utilities/singleton.h"
 
 enum class SpinState { kIdle, kSpinning, kSlowingDown, kStopped };
 
@@ -19,19 +20,21 @@ struct WheelOption {
 
 class SpinWheel {
 public:
-  SpinWheel(Vector2 pos, float r) : center_(pos), radius_(r) { InitializeOptions(); }
-
+  MAKE_SINGLETON(SpinWheel);
   void Update(float delta_time);
   void Draw();
 
-  std::vector<WheelOption> GetOptions() const { return options_; }
+  std::vector<WheelOption>& GetOptions() { return options_; }
+  void UpdateOptions();  // Reset Options' color and angles
+
   SpinState GetState() const { return state_; }
   bool IsShowingResult() const { return show_result_; }
 
 private:
+  SpinWheel() { InitializeOptions(); }
   std::vector<WheelOption> options_;
-  Vector2 center_;
-  float radius_;
+  Vector2 center_{GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f};
+  float radius_{200.0f};
   float start_angle_{0};
   float current_angle_{0};
   float target_angle_{0};
@@ -43,6 +46,7 @@ private:
   int selected_index_{-1};
 
   // 视觉效果
+  std::vector<Color> colors_;
   float pulse_animation_;
   bool show_result_;
   float result_display_time_;

@@ -1,11 +1,13 @@
 #include "terminal.h"
 #include <raylib.h>
 #include <algorithm>
+#include <cctype>
 #include <cstdlib>
 #include <functional>
 #include <sstream>
 #include "managers/font-manager.h"
 #include "utilities/color.h"
+#include "wheel/spin-wheel.h"
 
 Terminal::Terminal() : current_directory_("/home/player") {
   // clang-format off
@@ -18,6 +20,12 @@ Terminal::Terminal() : current_directory_("/home/player") {
       {"echo", [this](auto& args) { CmdEcho(args); }},
       {"set", [this](auto& args) { CmdSet(args); }},
       {"help", [this](auto& args) { CmdHelp(args); }},
+      {"exit", [this](auto& args) { CmdExit(); }},
+
+      {"show", [this](auto& args) { CmdShow(args); }},
+      {"add", [this](auto& args) { CmdAdd(args); }},
+      {"update", [this](auto& args) { CmdUpdate(args); }},
+      {"remove", [this](auto& args) { CmdRemove(args); }},
   };
   // clang-format on
   InitializeFilesystem();
@@ -347,6 +355,12 @@ void Terminal::CmdHelp(const std::vector<std::string>& args) {
   AddOutput("  set <prop> <val>   - Change terminal settings");
   AddOutput("  help               - Show this help");
   AddOutput("");
+  AddOutput("  show                            - Show wheel options");
+  AddOutput("  add <text> <weight>             - Add new option");
+  AddOutput("  update <index> <text> <weight>  - Update option at <index>");
+  AddOutput("  remove <index>                  - Remove option at <inde>");
+  AddOutput("  remove all                      - Remove all options");
+
   AddOutput("Use \\ key to toggle terminal");
 }
 
@@ -414,6 +428,113 @@ void Terminal::CmdSet(const std::vector<std::string>& args) {
     AddOutput("Type 'set' without arguments to see available properties");
   }
 }
+
+void Terminal::CmdShow(const std::vector<std::string>& args) {
+  const auto& options = SpinWheel::Get().GetOptions();
+  for (int i = 0; i < options.size(); i++) {
+    const auto& opt = options[i];
+    std::string output = std::to_string(i + 1) + " \t" + opt.text + "\t" + std::to_string(opt.weight);
+    AddOutput(output);
+  }
+}
+
+void Terminal::CmdAdd(const std::vector<std::string>& args) {
+  if (args.size() < 3) {
+    AddOutput("Usage: add <text> <weight>");
+    return;
+  }
+
+  std::string text = args[1];
+  int weight = 1;
+
+  try {
+    weight = std::stoi(args[2]);
+    if (weight <= 0) {
+      AddOutput("Error: Weight must be a positive integer");
+      return;
+    }
+  } catch (const std::exception& e) {
+    AddOutput("Error: Invalid weight value");
+    return;
+  }
+
+  SpinWheel::Get().GetOptions().emplace_back(WheelOption{text, WHITE, weight, 0.0f, 0.0f});
+  SpinWheel::Get().UpdateOptions();
+}
+
+void Terminal::CmdRemove(const std::vector<std::string>& args) {
+  if (args.size() < 2) {
+    AddOutput("Usage: remove <index>");
+    AddOutput("extor: remove add (remove all options)");
+    return;
+  }
+
+  int index = -1;
+  auto& options = SpinWheel::Get().GetOptions();
+
+  try {
+    index = std::stoi(args[1]) - 1;  // Convert to zero-based index
+    if (index < 0 || index >= SpinWheel::Get().GetOptions().size()) {
+      AddOutput("Error: Index out of range");
+      return;
+    }
+  } catch (const std::exception& e) {
+    if (args[1] == "all") {
+      options.clear();
+      return;
+    } else {
+      AddOutput("Error: Invalid index value");
+      return;
+    }
+  }
+
+  options.erase(options.begin() + index);
+  SpinWheel::Get().UpdateOptions();
+}
+
+void Terminal::CmdUpdate(const std::vector<std::string>& args) {
+  if (args.size() < 4) {
+    AddOutput("Usage: update <index> <text> <weight>");
+    return;
+  }
+
+  auto& options = SpinWheel::Get().GetOptions();
+  std::string text = args[2];
+
+  int index = -1;
+  try {
+    index = std::stoi(args[1]) - 1;  // Convert to zero-based index
+    if (index < 0 || index >= SpinWheel::Get().GetOptions().size()) {
+      AddOutput("Error: Index out of range");
+      return;
+    }
+  } catch (const std::exception& e) {
+    AddOutput("Error: Invalid index value");
+    return;
+  }
+
+  int weight = 1;
+  try {
+    weight = std::stoi(args[3]);
+    if (weight <= 0) {
+      AddOutput("Error: Weight must be a positive integer");
+      return;
+    }
+    if (weight > 20) {
+      AddOutput("Warning: Weight is too high, it may cause uneven distribution");
+      return;
+    }
+  } catch (const std::exception& e) {
+    AddOutput("Error: Invalid weight value");
+    return;
+  }
+
+  options[index].text = text;
+  options[index].weight = weight;
+  SpinWheel::Get().UpdateOptions();
+}
+
+void Terminal::CmdExit() { is_open_ = false; }
 
 std::vector<std::string> Terminal::SplitCommand(const std::string& command) {
   std::vector<std::string> result;

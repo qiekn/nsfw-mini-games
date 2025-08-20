@@ -66,6 +66,13 @@ private:
   void CmdClear(const std::vector<std::string>& args);
   void CmdPwd(const std::vector<std::string>& args);
   void CmdSet(const std::vector<std::string>& args);
+  void CmdExit();
+
+  void CmdShow(const std::vector<std::string>& args);
+  void CmdAdd(const std::vector<std::string>& args);
+  void CmdRemove(const std::vector<std::string>& args);
+  void CmdUpdate(const std::vector<std::string>& args);
+
   std::unordered_map<std::string, CommandFunc> command_table_;
 
   /* Utilities */
