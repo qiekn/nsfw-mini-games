@@ -7,9 +7,9 @@
 #include "utilities/ease.h"
 
 void SpinWheel::InitializeOptions() {
-  colors_ = {RED, BLUE, GREEN, YELLOW, PURPLE, ORANGE, PINK, SKYBLUE};
+  colors_ = {RED, BLUE, GREEN, LIGHTGRAY, PURPLE, ORANGE, PINK, SKYBLUE};
   std::vector<std::string> texts = {"Big", "Small", "Miss", "Again", "Secret", "Double", "Again", "SSR Huge"};
-  std::vector<int> weights = {2, 3, 1, 2, 1, 2, 2, 1};
+  std::vector<int> weights = {1, 1, 1, 2, 1, 2, 3, 1};
 
   for (int i = texts.size() - 1; i >= 0; i--) {
     options_.emplace_back(WheelOption{.text = texts[i], .weight = weights[i]});
