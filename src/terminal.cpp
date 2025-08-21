@@ -7,6 +7,7 @@
 #include <sstream>
 #include "managers/font-manager.h"
 #include "utilities/color.h"
+#include "utilities/helper.h"
 #include "wheel/spin-wheel.h"
 
 Terminal::Terminal() : current_directory_("/home/player") {
@@ -388,17 +389,11 @@ void Terminal::CmdSet(const std::vector<std::string>& args) {
   // Convert to lowercase for case-insensitive comparison
   std::transform(property.begin(), property.end(), property.begin(), ::tolower);
   std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-  if (property == "fontsize") {
-    try {
-      float new_size = std::stof(value);
-      if (new_size >= 8.0f && new_size <= 32.0f) {
-        font_size_ = new_size;
-        AddOutput("Font size set to " + value);
-      } else {
-        AddOutput("Error: Font size must be between 8 and 32");
-      }
-    } catch (const std::exception& e) {
-      AddOutput("Error: Invalid font size value");
+  if (property == "fontsize" && helper::IsNumber(value)) {
+    float new_size = std::stof(value);
+    if (new_size >= 8.0f && new_size <= 32.0f) {
+      font_size_ = new_size;
+      AddOutput("Font size set to " + value);
     }
   } else if (property == "bgcolor") {
     Color color = background_color_;  // Default fallback
@@ -417,7 +412,7 @@ void Terminal::CmdSet(const std::vector<std::string>& args) {
       color = Hexc(value);
     } else {
       AddOutput("Error: Unknown background color '" + value + "'");
-      AddOutput("Available colors: dark, black, gray, darkblue, darkgreen");
+      AddOutput("Available colors: dark, black, gray, blue, green");
       return;
     }
 
@@ -445,16 +440,19 @@ void Terminal::CmdAdd(const std::vector<std::string>& args) {
   }
 
   std::string text = args[1];
-  int weight = 1;
 
-  try {
-    weight = std::stoi(args[2]);
-    if (weight <= 0) {
-      AddOutput("Error: Weight must be a positive integer");
-      return;
-    }
-  } catch (const std::exception& e) {
-    AddOutput("Error: Invalid weight value");
+  if (helper::IsNumber(args[1])) {
+    AddOutput("Error: invalid weight");
+    return;
+  }
+
+  int weight = std::stoi(args[2]);
+  if (weight <= 0) {
+    AddOutput("Error: Weight must be a positive integer");
+    return;
+  }
+  if (weight > 20) {
+    AddOutput("Warning: Weight is too high, it may cause uneven distribution");
     return;
   }
 
@@ -469,23 +467,22 @@ void Terminal::CmdRemove(const std::vector<std::string>& args) {
     return;
   }
 
-  int index = -1;
   auto& options = SpinWheel::Get().GetOptions();
 
-  try {
-    index = std::stoi(args[1]) - 1;  // Convert to zero-based index
-    if (index < 0 || index >= SpinWheel::Get().GetOptions().size()) {
-      AddOutput("Error: Index out of range");
-      return;
-    }
-  } catch (const std::exception& e) {
-    if (args[1] == "all") {
-      options.clear();
-      return;
-    } else {
-      AddOutput("Error: Invalid index value");
-      return;
-    }
+  if (args[1] == "all") {
+    options.clear();
+    return;
+  }
+
+  if (!helper::IsNumber(args[1])) {
+    AddOutput("Error: Invalid index value");
+    return;
+  }
+
+  int index = std::stoi(args[1]) - 1;  // Convert to zero-based index
+  if (index < 0 || index >= SpinWheel::Get().GetOptions().size()) {
+    AddOutput("Error: Index out of range");
+    return;
   }
 
   options.erase(options.begin() + index);
@@ -494,38 +491,32 @@ void Terminal::CmdRemove(const std::vector<std::string>& args) {
 
 void Terminal::CmdUpdate(const std::vector<std::string>& args) {
   if (args.size() < 4) {
-    AddOutput("Usage: update <index> <text> <weight>");
+    AddOutput("Usage: update <index> <text> <weight> ");
+    AddOutput("Notes: weight must be a positive integer (1-20)");
     return;
   }
 
   auto& options = SpinWheel::Get().GetOptions();
   std::string text = args[2];
 
-  int index = -1;
-  try {
-    index = std::stoi(args[1]) - 1;  // Convert to zero-based index
-    if (index < 0 || index >= SpinWheel::Get().GetOptions().size()) {
-      AddOutput("Error: Index out of range");
-      return;
-    }
-  } catch (const std::exception& e) {
-    AddOutput("Error: Invalid index value");
+  if (!helper::IsNumber(args[1]) || !helper::IsNumber(args[3])) {
+    AddOutput("Error: Invalid index or weight value");
     return;
   }
 
-  int weight = 1;
-  try {
-    weight = std::stoi(args[3]);
-    if (weight <= 0) {
-      AddOutput("Error: Weight must be a positive integer");
-      return;
-    }
-    if (weight > 20) {
-      AddOutput("Warning: Weight is too high, it may cause uneven distribution");
-      return;
-    }
-  } catch (const std::exception& e) {
-    AddOutput("Error: Invalid weight value");
+  int index = std::stoi(args[1]) - 1;  // Convert to zero-based index
+  if (index < 0 || index >= SpinWheel::Get().GetOptions().size()) {
+    AddOutput("Error: Index out of range");
+    return;
+  }
+
+  int weight = std::stoi(args[3]);
+  if (weight <= 0) {
+    AddOutput("Error: Weight must be a positive integer");
+    return;
+  }
+  if (weight > 20) {
+    AddOutput("Warning: Weight is too high, it may cause uneven distribution");
     return;
   }
 
