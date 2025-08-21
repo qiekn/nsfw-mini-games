@@ -11,9 +11,10 @@ cmake -S . -B build && cmake --build build
 
 Firstly read [Raylib Docs](https://github.com/raysan5/raylib/wiki/Working-for-Web-(HTML5))
 
-1. Install emscripten toolchain
-
+Install [emscripten toolchain](https://emscripten.org/docs/getting_started/downloads.html).
 If you are on macOS, you can install Emscripten using Homebrew: `brew install emscripten`
+
+Build game with camke
 
 ```bash
 mkdir build
