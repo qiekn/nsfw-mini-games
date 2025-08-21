@@ -38,10 +38,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 # link libraries
 target_link_libraries(${PROJECT_NAME} raylib)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES 
-  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/game)
-
 if ("${PLATFORM}" STREQUAL "Web")
+  set_target_properties(${PROJECT_NAME} PROPERTIES 
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/game)
+
   add_custom_command(
     TARGET ${PROJECT_NAME} PRE_BUILD
     # Emscripten '--preload-file assets' use this fold
