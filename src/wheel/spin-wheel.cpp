@@ -8,7 +8,7 @@
 
 void SpinWheel::InitializeOptions() {
   colors_ = {RED, BLUE, GREEN, LIGHTGRAY, PURPLE, ORANGE, PINK, SKYBLUE};
-  std::vector<std::string> texts = {"Big", "Small", "Miss", "Again", "Secret", "Double", "Again", "SSR Huge"};
+  std::vector<std::string> texts = {"Big", "Small", "Miss", "Again", "Secret", "Double", "Again", "SSR"};
   std::vector<int> weights = {1, 1, 1, 2, 1, 2, 3, 1};
 
   for (int i = texts.size() - 1; i >= 0; i--) {
