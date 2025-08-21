@@ -10,7 +10,7 @@
 #include <emscripten/emscripten.h>
 #endif
 
-const int screen_width = 1000;
+const int screen_width = 960;
 const int screen_height = 700;
 
 float background_animation = 0;
