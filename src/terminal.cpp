@@ -358,7 +358,7 @@ void Terminal::CmdHelp(const std::vector<std::string>& args) {
   AddOutput("  show                            - Show wheel options");
   AddOutput("  add <text> <weight>             - Add new option");
   AddOutput("  update <index> <text> <weight>  - Update option at <index>");
-  AddOutput("  remove <index>                  - Remove option at <inde>");
+  AddOutput("  remove <index>                  - Remove option at <index>");
   AddOutput("  remove all                      - Remove all options");
 
   AddOutput("Use \\ key to toggle terminal");
