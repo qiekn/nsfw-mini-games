@@ -23,7 +23,7 @@ Build game with camke
 ```bash
 mkdir build
 cd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE=/Users/leoua7/Apps/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake -DPLATFORM=Web
+cmake .. -DCMAKE_TOOLCHAIN_FILE=/your-path-to-emsdk/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake -DPLATFORM=Web
 make
 ```
 
